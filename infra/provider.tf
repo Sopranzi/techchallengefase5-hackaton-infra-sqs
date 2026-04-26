@@ -1,7 +1,7 @@
 terraform {
   required_version = ">= 1.5.0"
   backend "s3" {
-    bucket = "terraform-state-soat-fase05-hackaton-g63"
+    bucket = "terraform-state-soat-fase05-hackton-g15"
     key    = "infra-sqs/terraform.tfstate"
     region = "us-east-1"
   }
