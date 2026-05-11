@@ -14,7 +14,7 @@ resource "aws_sqs_queue" "dlqs" {
   name     = "${each.value}-dlq" # Nomeia como nome-da-fila-dlq
 
   # DLQs geralmente têm retenção maior (ex: 14 dias)
-  message_retention_seconds = 1209600 
+  message_retention_seconds = 1209600
 
   tags = merge(var.tags, {
     Name = "${each.value}-dlq"
@@ -39,5 +39,29 @@ resource "aws_sqs_queue" "queues" {
 
   tags = merge(var.tags, {
     Name = each.value
+  })
+}
+
+resource "aws_sqs_queue_policy" "allow_raw_bucket_notifications" {
+  count = var.enable_s3_raw_notifications_policy && contains(var.queue_names, var.analysis_queue_name) ? 1 : 0
+
+  queue_url = aws_sqs_queue.queues[var.analysis_queue_name].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowRawBucketNotifications"
+        Effect    = "Allow"
+        Principal = { Service = "s3.amazonaws.com" }
+        Action    = "sqs:SendMessage"
+        Resource  = aws_sqs_queue.queues[var.analysis_queue_name].arn
+        Condition = {
+          ArnEquals = {
+            "aws:SourceArn" = "arn:aws:s3:::${var.raw_bucket_name}"
+          }
+        }
+      }
+    ]
   })
 }
