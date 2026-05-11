@@ -19,6 +19,24 @@ variable "queue_names" {
   ]
 }
 
+variable "raw_bucket_name" {
+  description = "Bucket S3 bruto autorizado a publicar eventos na fila de analise."
+  type        = string
+  default     = "techchallenge-fase5-raw"
+}
+
+variable "analysis_queue_name" {
+  description = "Nome da fila que recebe notificacoes S3 do bucket bruto."
+  type        = string
+  default     = "requested-analysis"
+}
+
+variable "enable_s3_raw_notifications_policy" {
+  description = "Habilita policy SQS para permitir notificacoes do bucket raw."
+  type        = bool
+  default     = true
+}
+
 variable "queue_configuration" {
   description = "Optional overrides applied to both queues"
   type = object({
